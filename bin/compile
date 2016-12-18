@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# bin/compile BUILD_DIR CACHE_DIR ENV_DIR
+
+# Fail fast and fail hard.
+set -eo pipefail
+[ "$BUILDPACK_XTRACE" ] && set -o xtrace
+
+# Variables
+BP_NAME="ffmpeg"
+
+BIN_DIR=$(cd $(dirname $0); pwd)
+BUILD_DIR=$1
+TMP_DIR="/tmp/$BP_NAME"
+VENDOR_DIR="$BUILD_DIR/.heroku/vendor"
+
+SOURCE_TARBALL='https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz'
+
+echo "Building $BP_NAME..."
+
+# Get binaries
+mkdir -p "$VENDOR_DIR/bin"
+curl -L "$SOURCE_TARBALL" | tar -Jxv --strip=1 -C "$VENDOR_DIR/bin"
+
+# Create .profile script for runtime environment
+PROFILE_PATH="$BUILD_DIR/.profile.d/$BP_NAME.sh"
+append-env() { echo "[[ \":\$$1:\" != *\":$2:\"* ]] && export $1=\"\$$1:$2\"" >> $PROFILE_PATH; }
+
+append-env PATH '/app/.heroku/vendor/bin'
+[[ -f "$VENDOR_DIR/bin/ffmpeg" ]] && append-env FFMPEG_PATH '/app/.heroku/vendor/bin/ffmpeg'
+[[ -f "$VENDOR_DIR/bin/ffprobe" ]] && append-env FFPROBE_PATH '/app/.heroku/vendor/bin/ffprobe'
