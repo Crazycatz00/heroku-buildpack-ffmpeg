@@ -26,5 +26,5 @@ PROFILE_PATH="$BUILD_DIR/.profile.d/$BP_NAME.sh"
 append-env() { echo "[[ \":\$$1:\" != *\":$2:\"* ]] && export $1=\"\$$1:$2\"" >> $PROFILE_PATH; }
 
 append-env PATH '/app/.heroku/vendor/bin'
-[[ -f "$VENDOR_DIR/bin/ffmpeg" ]] && append-env FFMPEG_PATH '/app/.heroku/vendor/bin/ffmpeg'
-[[ -f "$VENDOR_DIR/bin/ffprobe" ]] && append-env FFPROBE_PATH '/app/.heroku/vendor/bin/ffprobe'
+[[ -f "$VENDOR_DIR/bin/ffmpeg" ]] && echo 'export FFMPEG_PATH="/app/.heroku/vendor/bin/ffmpeg"' >> $PROFILE_PATH
+[[ -f "$VENDOR_DIR/bin/ffprobe" ]] && echo 'export FFPROBE_PATH="/app/.heroku/vendor/bin/ffprobe"' >> $PROFILE_PATH
